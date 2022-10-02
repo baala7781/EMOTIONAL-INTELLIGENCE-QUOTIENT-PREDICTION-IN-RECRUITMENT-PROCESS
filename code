@@ -1,0 +1,240 @@
+#section 1:Laoding dataset and training the model
+
+import numpy as np
+import pandas as pd
+df=pd.read_csv("D:/Desktop/PROJECTS/EQ/final.csv")
+df['gender'] = df['gender'].replace(['m'],1)
+df['gender'] = df['gender'].replace(['f'],0)
+df['area'] = df['area'].replace(['r'],1)
+df['area'] = df['area'].replace(['u'],0)
+df['gender'].fillna(1,inplace=True)
+x=df.drop(['Total'],axis=1) 
+y=df['Total']
+
+from sklearn.model_selection import train_test_split                                                      #For splitting training and testing data
+X_train,X_test,Y_train,Y_test=train_test_split(x,y,test_size=0.6,random_state=0)
+from sklearn.ensemble import RandomForestClassifier
+rfc1=RandomForestClassifier(n_estimators=200,max_depth=6)
+
+rfc1.fit(X_train,Y_train)
+
+
+
+
+section 2:   fill the appropriate details,taking the test,and predicting eq strength
+
+
+def score_check():                                              #function to display eq score
+    global s
+    message.place_forget()
+    actual_score.place(relx=.415,rely=.95)
+    check_score_button.place_forget()
+    actual_score.config(text="Emotional Quoutient Stength Predicted : "+str(s)+"%")
+
+   
+def getvalues():                                                #function to get values into testing label
+    global l,Score,y_predict,prediction
+    a=x.get()
+    a=int(a)   
+    b=y.get()
+    if b=="male" or "Male" or"m":
+        b=int(1)
+    elif b=="Female" or "female" or "f":
+        b=int(0)
+        
+    c=z.get()
+    if c=="Urban" or "urban" or "u":
+        c=int(0)
+    elif c=="Rural" or "rural" or "r":
+        c=int(1)
+    l=[]
+    l=[b,c,a,Score]
+    
+    
+    submit_button.place_forget()
+    message.place(relx=.37,rely=.95)
+    message.config(text="Thank you, your response has been submitted")
+    
+    
+    y_predict=rfc1.predict([l])                                 #testing through model
+    prediction=y_predict
+    
+    s=""
+    for i in prediction:
+        if i not in values:
+            s+=str(i)
+    check_score_button.place(relx=.65,rely=.95)
+      
+
+def check(option):                                              #funtion to select only sigle option at a time 
+    if option==1:
+        var2.set(0)
+        var3.set(0)
+    if option==2:
+        var1.set(0)
+        var3.set(0)
+    if option==3:
+        var1.set(0)
+        var2.set(0)
+        
+        
+#GUI interface
+from tkinter import*
+root=Tk()
+root.title("Emotional Qutient Prediction")
+root.configure(background="#d9d7d4")
+root.geometry("2000x2000")
+title=Label(root,text="Emotional Quotient Prediction",font=("Arial bold",25),width=100,bg="#fc963d",fg="white")
+title.pack()
+
+age=Label(root,text="Enter your Age",font=("Arial",12),bg="#d9d7d4")
+age.place(relx=0.05,rely=0.1)
+
+x=StringVar()
+ageValue=Entry(root,textvariable=x,bg="white")
+ageValue.place(relx=0.17,rely=0.1)
+
+gender=Label(root,text="Enter your Gender",font=("Arial",12),bg="#d9d7d4")
+gender.place(relx=0.05,rely=0.15)
+
+y=StringVar()
+genderValue=Entry(root,textvariable=y,bg="white")
+genderValue.place(relx=0.17,rely=0.15)
+
+area=Label(root,text="Enter your Area",font=("Arial",12),bg="#d9d7d4")
+area.place(relx=0.05,rely=0.20)
+
+z=StringVar()
+areaValue=Entry(root,textvariable=z,bg="white")
+areaValue.place(relx=0.17,rely=0.20)
+
+
+submit_button=Button(root,text="  SUBMIT  ",command=getvalues,width=13,bg="#fc963d")                    #submit button
+submit_button.place_forget()
+
+
+check_score_button=Button(root,text="Check your Score",command=score_check,width=13,bg="#fc963d")                     #check your score button
+check_score_button.place_forget()
+
+
+next_b=Button(root,text="Next",width=13,height=1,command=next,bg="#fc963d")                                           #next button
+next_b.place(relx=0.135,rely=0.87)
+
+
+message=Label(root,text="Thank you, your response has been submitted",font=("Arial",12),bg="#d9d7d4")                 #thank you message label
+message.place_forget()
+
+
+actual_score=Label(root,font=("Arial",12),bg="#d9d7d4")                                                               #eq predicted label
+actual_score.place_forget()
+
+
+test_heading=Label(root,text="----------Psychometric Test----------",font=("Arial bold",17),bg="#d9d7d4")             #test heading label
+test_heading.place(relx=0.032,rely=0.43)
+
+Questions=["How would you describe the quality of your work? ",
+           "When you are part of a group, to what extent are you likely to stand up for what is right when no one else will? ",
+           "In the past, how frequently have others asked for your advice because of your expertise?",
+          "To what extent have you accepted changes in work process or activities? ",
+           "How comfortable have you felt taking actions when the outcome is uncertain? ",
+          "How often do you choose to take a leadership role when in a group situation?",
+          "Learning through experience and varied assignments.",
+          "Having decision-making authority ",
+          "Receiving a very high stating salary ",
+          "Work that requires variety of skills ",
+          "Having a clear understanding of your work responsibilities ",
+          "Having good work life balance ",
+          "Can achieve a lot with limited resources ",
+          "Understand people very well ",
+          "Come up with new ideas about as often as my peers do."]
+
+Options=[["Always submitted on time but overlooked some small details ","Sometimes submitted late but all of the small details were correct","Always submitted on time and all of the small details were correct"],
+         ["Great extent","Moderate extent","Slight extent"],
+        ["Much more often than they asked others","More often than they asked others","No quite often as they asked others."],
+        ["Great extent","Moderate extent","Slight extent"],
+        ["Much better than others","Better than others","No quite as good as others"],
+        ["Very often","Often","Rarely"],
+        ["Not important","Somewhat important","Highly important"],
+        ["Not important","Somewhat important","Highly important"],
+        ["Not important","Somewhat important","Highly important"],
+        ["Not important","Somewhat important","Highly important"],
+        ["Not important","Somewhat important","Highly important"],
+         ["Not important","Somewhat important","Highly important"],
+        ["Inaccurate","Accurate","Very accurate"],
+        ["Inaccurate","Accurate","Very accurate"],
+        ["Inaccurate","Accurate","Very accurate"],]
+Answers=[3,1,2,2,2,1,3,2,1,2,3,3,2,2,2]
+Score=0
+
+Total_no_of_questions=15
+Question_no=1 
+
+
+def next():                                                                   #the next button function
+    global Score,Question_no
+    if var1.get()==1:
+        selected_option=1
+    elif var2.get()==1:
+        selected_option=2
+    elif var3.get()==1:
+        selected_option=3
+    else:
+        selected_option=-1
+    if(Answers[Question_no-1]==selected_option):
+        Score+=1
+    Question_no+=1
+    if Question_no>Total_no_of_questions:
+        next_b.place_forget()
+        submit_button.place(relx=.45,rely=.9)     
+        
+    else:
+        #go to next question
+        var1.set(0)
+        var2.set(0)
+        var3.set(0)
+        question.config(text=str(Question_no)+")   "+Questions[Question_no-1])
+        option1.config(text=Options[Question_no-1][0])
+        option2.config(text=Options[Question_no-1][1])
+        option3.config(text=Options[Question_no-1][2])
+
+        
+
+question=Label(root,text=str(Question_no)+")   "+Questions[0],font=("Arial 16"),bg="#d9d7d4")                         #question section
+question.place(relx=0.05,rely=0.52)
+var1=IntVar()
+var2=IntVar()
+var3=IntVar()
+
+
+
+option1=Checkbutton(root,variable=var1,text=Options[0][0],font=("Arial 12 "),command=lambda:check(1),bg="#d9d7d4")            #options section
+option1.place(relx=0.05,rely=0.60)
+
+option2=Checkbutton(root,variable=var2,text=Options[0][1],font=("Arial 12"),command=lambda:check(2),bg="#d9d7d4")
+option2.place(relx=0.05,rely=0.67)
+option3=Checkbutton(root,variable=var3,text=Options[0][2],font=("Arial 12"),command=lambda:check(3),bg="#d9d7d4")
+option3.place(relx=0.05,rely=0.74)
+
+root.mainloop()
+
+
+
+
+
+#section 3:Checking Accuracy of the model
+
+print(prediction)                                                                     #predicted EQ_strength
+y_predict=rfc1.predict(X_test)
+y_predict
+
+
+from sklearn.metrics import confusion_matrix,accuracy_score                             #finding accuracy
+accuracy=accuracy_score(Y_test,y_predict)
+print("accuracy of the model is : "+str((accuracy*100).round(3)))
+
+
+
+
+
+
+
